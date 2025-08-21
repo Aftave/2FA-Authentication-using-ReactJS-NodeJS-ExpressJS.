@@ -2,8 +2,6 @@
 
 A full‑stack example that layers **Two‑Factor Authentication (2FA)** on top of a username/password login. The repository is organized as a **monorepo** with a React front end and a Node/Express back end connected to MongoDB.
 
-> **Heads‑up (security):** The latest commit replaces real values in `Backend/.env` with placeholders. If any credentials were ever pushed publicly, rotate them immediately (MongoDB user/password, JWT and session secrets).
-
 ---
 
 ## Table of contents
@@ -46,8 +44,6 @@ A full‑stack example that layers **Two‑Factor Authentication (2FA)** on top 
 
 - Screens for register, login, and 2FA input.
 - Calls the backend for signup/login and for 2FA verification.
-
-> Exact library choices (e.g., TOTP vs. one‑time codes via email/SMS) depend on how you configure the service layer. See the notes in **API overview** for common patterns.
 
 ---
 
@@ -135,8 +131,7 @@ Use the appropriate variable in your API client code.
 1. **Register** → user submits email/username + password. Password is hashed and stored in MongoDB.
 2. **Login (step 1)** → user enters credentials; server validates and issues a *pending‑2FA* state (e.g., short‑lived token or server session).
 3. **2FA (step 2)** → user provides the one‑time code (from email/SMS **or** from an authenticator app if TOTP is enabled).
-4. **On success** → server establishes a logged‑in session (cookie) and/or returns a JWT to the client.
-5. **On failure** → retry window & rate limits apply; codes expire quickly.
+4. **On success** → server establishes a logged‑in session (cookie) and returns a JWT to the client.
 
 > OTP delivery and TOTP setup vary by configuration. If using TOTP, the server typically exposes an endpoint to generate a secret and QR code during setup and stores the shared secret for future verification.
 
@@ -165,14 +160,9 @@ POST   /api/2fa/verify           { code } → completes login
 POST   /api/2fa/setup            → returns { otpauth_url, base32Secret }
 POST   /api/2fa/enable           { code } → confirms TOTP and enables on the account
 POST   /api/2fa/verify           { code } → completes login (or sensitive action)
-POST   /api/2fa/disable          { password?, code? } → removes TOTP after re‑auth
+POST   /api/2fa/reset          { password?, code? } → removes TOTP after re‑auth
 ```
 
-**Tokens (optional)**
-
-```
-POST   /api/auth/refresh         → refresh access token
-```
 
 ---
 
